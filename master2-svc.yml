@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    run: master2
+  name: master2
+  selfLink: /api/v1/namespaces//services/master2
+spec:
+  ports:
+  - protocol: TCP
+    port: 6443
+    name: https-port
+  - protocol: TCP
+    port: 8080
+    name: http-port
+  selector:
+    run: master2
+  sessionAffinity: None
+  type: LoadBalancer
+status:
+  loadBalancer: {}
