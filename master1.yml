@@ -38,13 +38,32 @@ spec:
         - --service-cluster-ip-range=10.100.0.0/24
         - --etcd-servers=http://etcd-client:2379
         - --etcd-prefix="/master1/"
+        - --advertise-address=85.222.238.106
+        - --service-account-key-file=/opt/bin/kube-serviceaccount.key
+        - --service-account-lookup=false
+        - --token-auth-file=/opt/tokens/tokens.csv
+        - --authorization-policy-file=/opt/auth/auth-policy.json
+        - --authorization-mode=ABAC
         image: gcr.io/google_containers/kube-apiserver:v1.3.4
         imagePullPolicy: Always
         name: kube-apiserver
+        volumeMounts:
+          - mountPath: /opt/bin
+            name: opt-dir
+            readOnly: true
+          - name: tokens
+            mountPath: /opt/tokens
+          - name: auth
+            mountPath: /opt/auth
       - command:
         - /usr/local/bin/kube-controller-manager
         - --master=http://127.0.0.1:8080
+        - --service-account-private-key-file=/opt/bin/kube-serviceaccount.key
         - --leader-elect=true
+        volumeMounts:
+          - mountPath: /opt/bin
+            name: opt-dir
+            readOnly: true
         image: gcr.io/google_containers/kube-controller-manager:v1.3.4
         imagePullPolicy: Always
         name: kube-controller-manager
@@ -59,4 +78,15 @@ spec:
       restartPolicy: Always
       securityContext: {}
       terminationGracePeriodSeconds: 30
+      volumes:
+        - name: opt-dir
+          hostPath:
+            path: /opt/bin
+        - name: tokens
+          secret:
+            secretName: tokens
+        - name: auth
+          secret:
+            secretName: auth
+   
 status: {}

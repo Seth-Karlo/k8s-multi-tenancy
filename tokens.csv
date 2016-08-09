@@ -1,0 +1,4 @@
+changeme,admin,admin
+kubelet,kubelet,kubelet
+scheduler,scheduler,scheduler
+pong,ping,health

@@ -39,3 +39,28 @@ resource "cloudstack_network_acl_rule" "acl-rule" {
   }
 }
 
+resource "cloudstack_ipaddress" "worker_public_ip" {
+  provider = "cloudstack.nl2"
+  count = "${lookup(var.counts, "worker")}"
+  vpc = "${element(cloudstack_vpc.vpc.*.id, count.index)}"
+  depends_on = ["cloudstack_instance.kube-worker"]
+}
+
+resource "cloudstack_port_forward" "worker" {
+  provider = "cloudstack.nl2"
+  count = "${lookup(var.counts, "worker")}"
+  ipaddress = "${element(cloudstack_ipaddress.worker_public_ip.*.id, count.index)}"
+
+  forward {
+    protocol = "tcp"
+    private_port = "22"
+    public_port = "22"
+    virtual_machine_id = "${element(cloudstack_instance.kube-worker.*.id, count.index)}"
+  }
+  forward {
+    protocol = "tcp"
+    private_port = "10250"
+    public_port = "10250"
+    virtual_machine_id = "${element(cloudstack_instance.kube-worker.*.id, count.index)}"
+  }
+}
