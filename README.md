@@ -1,7 +1,8 @@
 ## This is very much a WIP
 
+
 - Start by setting up etcd:
-- 
+
 `kubectl create -f etcd.yml`
 
 - Then, for your tenant:
