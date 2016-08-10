@@ -44,6 +44,9 @@ spec:
         - --token-auth-file=/opt/tokens/tokens.csv
         - --authorization-policy-file=/opt/auth/auth-policy.json
         - --authorization-mode=ABAC
+        - --client-ca-file=/opt/ca.pem/ca.pem
+        - --tls-cert-file=/opt/kubernetes.pem/kubernetes.pem
+        - --tls-private-key-file=/opt/kubernetes-key.pem/kubernetes-key.pem
         image: gcr.io/google_containers/kube-apiserver:v1.3.4
         imagePullPolicy: Always
         name: kube-apiserver
@@ -55,6 +58,12 @@ spec:
             mountPath: /opt/tokens
           - name: auth
             mountPath: /opt/auth
+          - name: ca-pem
+            mountPath: /opt/ca.pem
+          - name: kubernetes-pem
+            mountPath: /opt/kubernetes.pem
+          - name: kubernetes-key-pem
+            mountPath: /opt/kubernetes-key.pem
       - command:
         - /usr/local/bin/kube-controller-manager
         - --master=http://127.0.0.1:8080
@@ -88,5 +97,14 @@ spec:
         - name: auth
           secret:
             secretName: auth
+        - name: ca-pem
+          secret:
+            secretName: ca.pem
+        - name: kubernetes-pem
+          secret:
+            secretName: kubernetes.pem
+        - name: kubernetes-key-pem
+          secret:
+            secretName: kubernetes-key.pem
    
 status: {}

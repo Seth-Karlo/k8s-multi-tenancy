@@ -1,0 +1,22 @@
+{
+  "CN": "kubernetes",
+  "hosts": [
+    "kubernetes",
+    "10.100.0.1",
+    "85.222.238.106",
+    "127.0.0.1"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "NL",
+      "L": "Amsterdam",
+      "O": "Kubernetes",
+      "OU": "Cluster",
+      "ST": "Holland"
+    }
+  ]
+}
