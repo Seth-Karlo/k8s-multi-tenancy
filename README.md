@@ -87,7 +87,7 @@ var.clustername
   Enter a value: customer1
 
 var.master_url
-  Enter a value: https://85.222.238.107:6443
+  Enter a value: https://85.222.238.106:6443
 
 var.source_cidr
   Enter a value: 85.222.238.59/32
@@ -96,7 +96,7 @@ var.source_cidr
 Wait a minute or so, and then:
 
 ```
-kubectl -s https://85.222.238.107:6443 get nodes
+kubectl -s https://85.222.238.106:6443 get nodes
 NAME          STATUS    AGE
 10.100.0.46   Ready     32s
 ```
