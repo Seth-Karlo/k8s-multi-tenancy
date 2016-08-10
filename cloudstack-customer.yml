@@ -6,14 +6,14 @@ metadata:
   creationTimestamp: null
   generation: 1
   labels:
-    run: master1
-  name: master1
+    run: customer1
+  name: customer1
   selfLink: /apis/extensions/v1beta1/namespaces//deployments/master1
 spec:
   replicas: 3
   selector:
     matchLabels:
-      run: master1
+      run: customer1
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -23,7 +23,7 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        run: master1
+        run: customer1
     spec:
       containers:
       - command:
@@ -64,6 +64,8 @@ spec:
             mountPath: /opt/kubernetes.pem
           - name: kubernetes-key-pem
             mountPath: /opt/kubernetes-key.pem
+          - name: cloud-config
+            mountPath: /opt/cloud-config
       - command:
         - /usr/local/bin/kube-controller-manager
         - --master=http://127.0.0.1:8080
@@ -106,5 +108,8 @@ spec:
         - name: kubernetes-key-pem
           secret:
             secretName: kubernetes-key.pem
+        - name: cloud-config
+          secret:
+            secretName: cloud-config
    
 status: {}
