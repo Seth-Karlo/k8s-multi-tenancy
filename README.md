@@ -1,5 +1,11 @@
 ## This is very much a WIP
 
+- Create secrets in host cluster
+
+``` 
+kubectl create secret generic tokens --from-file=tokens.csv
+kubectl create secret generic auth --from-file=auth-policy.json
+```
 
 - Start by setting up etcd:
 
