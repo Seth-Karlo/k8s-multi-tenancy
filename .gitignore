@@ -1,3 +1,4 @@
 *tfstate*
 *.pem
 *.csr
+*.key

@@ -22,12 +22,20 @@ cfssl_darwin-amd64 gencert -initca ca-csr.json| cfssljson_darwin-amd64 -bare ca
 cfssl_darwin-amd64  gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kubernetes-csr.json | cfssljson_darwin-amd64 -bare kubernetes
 ```
 
+(As a side note, you can edit kubernetes-csr.json and add in your public IP if you wish)
+
 - Add them as secrets:
 
 ```
 kubectl create secret generic ca.pem --from-file=ca.pem
 kubectl create secret generic kubernetes.pem --from-file=kubernetes.pem
 kubectl create secret generic kubernetes-key.pem --from-file=kubernetes-key.pem
+```
+- Create and push service account key:
+
+```
+openssl genrsa -out kube-serviceaccount.key 2048
+kubectl create secret generic kube-serviceaccount.key --from-file=kube-serviceaccount.key
 ```
 
 - If using cloudstack, generate a file in this format:
