@@ -5,7 +5,7 @@ metadata:
   labels:
     run: customer1
   name: customer1
-  selfLink: /api/v1/namespaces//services/master1
+  selfLink: /api/v1/namespaces//services/customer1
 spec:
   ports:
   - protocol: TCP

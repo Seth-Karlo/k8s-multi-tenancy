@@ -51,9 +51,8 @@ spec:
         imagePullPolicy: Always
         name: kube-apiserver
         volumeMounts:
-          - mountPath: /opt/bin
-            name: opt-dir
-            readOnly: true
+          - name: kube-serviceaccount-key
+            mountPath: /opt/kube-serviceaccount.key
           - name: tokens
             mountPath: /opt/tokens
           - name: auth
@@ -72,9 +71,8 @@ spec:
         - --service-account-private-key-file=/opt/bin/kube-serviceaccount.key
         - --leader-elect=true
         volumeMounts:
-          - mountPath: /opt/bin
-            name: opt-dir
-            readOnly: true
+          - name: kube-serviceaccount-key
+            mountPath: /opt/kube-serviceaccount.key
         image: gcr.io/google_containers/kube-controller-manager:v1.3.4
         imagePullPolicy: Always
         name: kube-controller-manager
@@ -90,9 +88,6 @@ spec:
       securityContext: {}
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: opt-dir
-          hostPath:
-            path: /opt/bin
         - name: tokens
           secret:
             secretName: tokens
@@ -108,6 +103,9 @@ spec:
         - name: kubernetes-key-pem
           secret:
             secretName: kubernetes-key.pem
+        - name: kube-serviceaccount-key
+          secret:
+            secretName: kube-serviceaccount.key
         - name: cloud-config
           secret:
             secretName: cloud-config
