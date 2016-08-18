@@ -1,0 +1,128 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "2"
+  creationTimestamp: null
+  generation: 1
+  labels:
+    run: connect-cluster2
+  name: connect-cluster2
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      run: connect-cluster2
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: connect-cluster2
+    spec:
+      containers:
+      - command:
+        - /usr/local/bin/kube-apiserver
+        - --admission-control=NamespaceLifecycle,NamespaceAutoProvision,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota
+        - --runtime-config=api/v1
+        - --allow-privileged=true
+        - --insecure-bind-address=0.0.0.0
+        - --bind-address=0.0.0.0
+        - --insecure-port=8080
+        - --secure-port=6443
+        - --service-cluster-ip-range=10.100.0.0/24
+        - --etcd-servers=http://etcd-client:2379
+        - --etcd-prefix="/master2/"
+        - --advertise-address=85.222.238.110
+        - --service-account-key-file=/opt/kube-serviceaccount.key/kube-serviceaccount.key
+        - --service-account-lookup=false
+        - --token-auth-file=/opt/tokens/tokens.csv
+        - --authorization-policy-file=/opt/auth/auth-policy.json
+        - --authorization-mode=ABAC
+        - --client-ca-file=/opt/ca.pem/ca.pem
+        - --tls-cert-file=/opt/kubernetes.pem/kubernetes.pem
+        - --tls-private-key-file=/opt/kubernetes-key.pem/kubernetes-key.pem
+        - --cloud-provider=cloudstack
+        - --cloud-config=/opt/cloud-config/nl2-config
+        image: sethkarlo/kube-apiserver
+        imagePullPolicy: Always
+        name: kube-apiserver
+        volumeMounts:
+          - name: kube-serviceaccount-key
+            mountPath: /opt/kube-serviceaccount.key
+          - name: tokens
+            mountPath: /opt/tokens
+          - name: auth
+            mountPath: /opt/auth
+          - name: ca-pem
+            mountPath: /opt/ca.pem
+          - name: kubernetes-pem
+            mountPath: /opt/kubernetes.pem
+          - name: kubernetes-key-pem
+            mountPath: /opt/kubernetes-key.pem
+          - name: cloud-config
+            mountPath: /opt/cloud-config
+      - command:
+        - /usr/local/bin/kube-controller-manager
+        - --master=http://127.0.0.1:8080
+        - --cloud-provider=cloudstack
+        - --cloud-config=/opt/cloud-config/nl2-config
+        - --service-account-private-key-file=/opt/kube-serviceaccount.key/kube-serviceaccount.key
+        - --leader-elect=true
+        volumeMounts:
+          - name: kube-serviceaccount-key
+            mountPath: /opt/kube-serviceaccount.key
+          - name: cloud-config
+            mountPath: /opt/cloud-config
+          - name: ca-certificates
+            mountPath: /usr/share/ca-certificates
+          - name: etc-ssl
+            mountPath: /etc/ssl
+        image: sethkarlo/kube-controller-manager
+        imagePullPolicy: Always
+        name: kube-controller-manager
+      - command:
+        - /usr/local/bin/kube-scheduler
+        - --master=http://127.0.0.1:8080
+        - --leader-elect=true
+        image: sethkarlo/kube-scheduler
+        imagePullPolicy: Always
+        name: kube-scheduler
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: tokens
+          secret:
+            secretName: tokens
+        - name: auth
+          secret:
+            secretName: auth
+        - name: ca-pem
+          secret:
+            secretName: ca.pem
+        - name: kubernetes-pem
+          secret:
+            secretName: kubernetes.pem
+        - name: kubernetes-key-pem
+          secret:
+            secretName: kubernetes-key.pem
+        - name: kube-serviceaccount-key
+          secret:
+            secretName: kube-serviceaccount.key
+        - name: cloud-config
+          secret:
+            secretName: cloud-config
+        - name: ca-certificates
+          hostPath:
+            path: /usr/share/ca-certificates
+        - name: etc-ssl
+          hostPath:
+            path: /etc/ssl
+   
+status: {}
