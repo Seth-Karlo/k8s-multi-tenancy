@@ -1,2 +1,2 @@
-discovery_url = "https://discovery.etcd.io/3befc11e500d803f52ed14e370746650"
+discovery_url = "https://discovery.etcd.io/3636574b8e6181e2cae6f2686ab92397"
 clustername = "sbpaapi"

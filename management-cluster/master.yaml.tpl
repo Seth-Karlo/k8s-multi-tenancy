@@ -41,6 +41,7 @@ write-files:
       ${node1IP} node1k8s.services.schubergphilis.com
       ${node2IP} node2k8s.services.schubergphilis.com
       ${node3IP} node3k8s.services.schubergphilis.com
+      85.222.236.236 registry.services.schubergphilis.com
   - path: /opt/bin/read-vault.sh
     permissions: 0755
     content: |
@@ -186,7 +187,6 @@ coreos:
         [Unit]
         Description=Splunk forwarder Container for journalctl
         [Service]
-        ExecStartPre=/bin/sh -c 'echo 85.222.236.236 registry.services.schubergphilis.com >>/etc/hosts'
         ExecStart=/usr/bin/docker run -d -h %H --name splunk \
           -v /var/log/splunk:/var/log/splunk \
           -e SPLUNK_INPUTPATH_1=/var/log/splunk/journald.log \

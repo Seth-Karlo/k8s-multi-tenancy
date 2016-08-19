@@ -59,7 +59,7 @@ vault write secret/k8smgt/${TF_VAR_env}/app/${TF_VAR_stack_id}/cloud-config valu
 
 # Generate an initial kubernetes admin token 
 ```
-  export TF_VAR_initial_admin_token=`cat /dev/urandom |tr -dc _A-Z-a-z-0-9 | head -c32`
+  export TF_VAR_initial_admin_token=`cat /dev/urandom | base64 |tr -dc _A-Z-a-z-0-9 | head -c32`
   echo $TF_VAR_initial_admin_token
 ```
 
@@ -89,9 +89,6 @@ host ${TF_VAR_stack_id}k8s.services.schubergphilis.com
 host ${TF_VAR_stack_id}k8s-master1.services.schubergphilis.com
 host ${TF_VAR_stack_id}k8s-master2.services.schubergphilis.com
 host ${TF_VAR_stack_id}k8s-master3.services.schubergphilis.com
-host ${TF_VAR_stack_id}k8s-worker1.services.schubergphilis.com
-host ${TF_VAR_stack_id}k8s-worker2.services.schubergphilis.com
-host ${TF_VAR_stack_id}k8s-worker3.services.schubergphilis.com
 ```
 
 # Connecting to your cluster
@@ -106,8 +103,7 @@ kubectl get namespaces
 # DNS Deployment
 Get the internal IP of one of the masters for DNS deployment and replace this with the DNS deployment
 ```
-ssh core@${TF_VAR_stack_id}k8s.services.schubergphilis.com ifconfig |egrep -A1 '^eth0' |grep inet |awk '{print $2}'
-sed 's/10.100.0.1/xx.xx.xx.xx/g' addons/skydns-rc.yaml| kubectl create -f -
-cat addons/skydns-svc.yaml| kubectl create -f -
+kubectl create -f addons/skydns-rc.yaml
+kubectl create -f addons/skydns-svc.yaml
 ```
 
