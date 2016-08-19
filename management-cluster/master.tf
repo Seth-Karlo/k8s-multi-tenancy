@@ -22,7 +22,7 @@ resource "cloudstack_instance" "kube-master" {
   zone = "${lookup(var.cs_zones, "master")}"
   service_offering = "${lookup(var.offerings, "master")}"
   template = "${var.cs_template}"
-  name = "${var.clustername}k8s-master${count.index+1}"
+  name = "mcpp${var.clustername}-master${count.index+1}"
   network = "${cloudstack_network.network.0.id}"
   expunge = "true"
   user_data = "${element(template_file.master-config.*.rendered, count.index)}"

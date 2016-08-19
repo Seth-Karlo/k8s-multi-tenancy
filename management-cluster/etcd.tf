@@ -13,7 +13,7 @@ resource "cloudstack_instance" "etcd" {
   provider = "cloudstack.nl2"
     count            = "${lookup(var.counts, "etcd")}"
     expunge          = true
-    name             = "${var.clustername}k8s-etcd0${count.index+1}"
+    name             = "mcpp${var.clustername}-etcd0${count.index+1}"
     service_offering = "${lookup(var.offerings, "etcd")}"
     template         = "${var.cs_template}"
     zone             = "${lookup(var.cs_zones, "etcd" )}"
