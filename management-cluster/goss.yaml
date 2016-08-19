@@ -1,0 +1,67 @@
+command:
+  docker run --net=host --rm lachlanevenson/k8s-kubectl:latest --server=http://127.0.0.1:8080 get services:
+    exit-status: 0
+    stdout:
+    - "/kubernetes.*10.100.0.1.*443.TCP/"
+  docker run --net=host --rm lachlanevenson/k8s-kubectl:latest --server=http://127.0.0.1:8080 get nodes:
+    exit-status: 0
+    stdout:
+    - "Ready"
+    - "!/NotReady/"
+http:
+  https://127.0.0.1:6443:
+    status: 401
+    allow-insecure: true
+    timeout: 1000
+    body:
+    - "Unauthorized"
+file:
+  /etc/hosts:
+    exists: true
+    mode: "0755"
+    owner: root
+    filetype: file
+    contains:
+    - node1k8s.services.schubergphilis.com
+    - node2k8s.services.schubergphilis.com
+    - node3k8s.services.schubergphilis.com
+  /opt/apiserver-key.pem:
+    exists: true
+    mode: "0644"
+    owner: root
+    filetype: file
+  /opt/apiserver.pem:
+    exists: true
+    mode: "0644"
+    owner: root
+    filetype: file
+  /opt/auth-policy.jsonl:
+    exists: true
+    mode: "0644"
+    owner: root
+    filetype: file
+    contains:
+    - "abac.authorization.kubernetes.io/v1beta1"
+  /opt/ca.pem:
+    exists: true
+    mode: "0644"
+    owner: root
+    filetype: file
+service:
+  docker.service:
+    enabled: false
+    running: true
+  kube-apiserver:
+    enabled: true
+    running: true
+  kube-controller-manager:
+    enabled: true
+    running: true
+  kube-scheduler:
+    enabled: true
+    running: true
+port:
+  tcp6:8080:
+    listening: true
+  tcp6:6443:
+    listening: true
