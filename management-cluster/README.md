@@ -20,7 +20,7 @@ Hashicorp terraform binaries
 
 Kubernetes kubectl binary
 ```
-  curl -O https://storage.googleapis.com/kubernetes-release/release/v1.3.0/bin/darwin/amd64/kubectl
+  curl -O https://artifacts.schubergphilis.com/artifacts/kubernetes/v1.3.4/bin/darwin/amd64/kubectl
   chmod +x kubectl
 ```
 
