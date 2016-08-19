@@ -101,8 +101,7 @@ kubectl get namespaces
 # DNS Deployment
 Get the internal IP of one of the masters for DNS deployment and replace this with the DNS deployment
 ```
-ssh core@${TF_VAR_stack_id}k8s.services.schubergphilis.com ifconfig |egrep -A1 '^eth0' |grep inet |awk '{print $2}'
-sed 's/10.100.0.1/xx.xx.xx.xx/g' addons/skydns-rc.yaml| kubectl create -f -
-cat addons/skydns-svc.yaml| kubectl create -f -
+kubectl create -f addons/skydns-rc.yaml
+kubectl create -f addons/skydns-svc.yaml
 ```
 
