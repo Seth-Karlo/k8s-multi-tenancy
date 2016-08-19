@@ -52,6 +52,11 @@ done
 cd ..
 ```
 
+# Generate your nl2-config and put in Vault
+```
+vault write secret/k8smgt/${TF_VAR_env}/app/${TF_VAR_stack_id}/cloud-config value=@nl2-config
+```
+
 # Generate an initial kubernetes admin token 
 ```
   export TF_VAR_initial_admin_token=`cat /dev/urandom |tr -dc _A-Z-a-z-0-9 | head -c32`

@@ -67,7 +67,8 @@ coreos:
         ExecStartPost=/opt/bin/read-vault.sh secret/k8smgt/prod/app/${clustername}/ca.pem value /opt/ca.pem
         ExecStartPost=/opt/bin/read-vault.sh secret/k8smgt/prod/app/${clustername}/apiserver.pem value /opt/apiserver.pem
         ExecStartPost=/opt/bin/read-vault.sh secret/k8smgt/prod/app/${clustername}/apiserver-key.pem value /opt/apiserver-key.pem
-        ExecStartPost=/opt/bin/read-vault.sh secret/k8smgt/prod/app/${clustername}/kube-serviceaccount.key value /opt/bin/kube-serviceaccount.key
+        ExecStartPost=/opt/bin/read-vault.sh secret/k8smgt/prod/app/${clustername}/kube-serviceaccount.key value /opt/kube-serviceaccount.key
+        ExecStartPost=/opt/bin/read-vault.sh secret/k8smgt/prod/app/${clustername}/cloud-config value /opt/cloud-config
 
         RemainAfterExit=yes
         Type=oneshot
@@ -112,7 +113,7 @@ coreos:
         ExecStartPre=/usr/bin/chmod +x /opt/bin/kube-apiserver
         ExecStartPre=/opt/bin/wupiao node1k8s.services.schubergphilis.com:4001/v2/machines
         ExecStart=/opt/bin/kube-apiserver \
-          --service-account-key-file=/opt/bin/kube-serviceaccount.key \
+          --service-account-key-file=/opt/kube-serviceaccount.key \
           --service-account-lookup=false \
           --admission-control=NamespaceLifecycle,NamespaceAutoProvision,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota \
           --apiserver-count=3 \
@@ -125,6 +126,8 @@ coreos:
           --insecure-port=8080 \
           --kubelet-https=true \
           --secure-port=6443 \
+          --cloud-provider=cloudstack \
+          --cloud-config=/opt/cloud-config \
           --tls-cert-file="/opt/apiserver.pem" \
           --tls-private-key-file="/opt/apiserver-key.pem" \
           --service-cluster-ip-range=10.100.0.0/24 \
@@ -147,11 +150,13 @@ coreos:
         ExecStartPre=/usr/bin/curl -L -o /opt/bin/kube-controller-manager -z /opt/bin/kube-controller-manager https://artifacts.schubergphilis.com/artifacts/kubernetes/v1.3.4/bin/linux/amd64/kube-controller-manager
         ExecStartPre=/usr/bin/chmod +x /opt/bin/kube-controller-manager
         ExecStart=/opt/bin/kube-controller-manager \
-          --service-account-private-key-file=/opt/bin/kube-serviceaccount.key \
+          --service-account-private-key-file=/opt/kube-serviceaccount.key \
           --master=$${DEFAULT_IPV4}:8080 \
           --leader-elect=true \
           --cluster-name=nl2-k8s \
           --logtostderr=true \
+          --cloud-provider=cloudstack \
+          --cloud-config=/opt/cloud-config \
           --root-ca-file="/opt/ca.pem" \
           --v=2
         Restart=always

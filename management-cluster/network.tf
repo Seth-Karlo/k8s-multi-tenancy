@@ -29,9 +29,6 @@ resource "cloudstack_network" "network" {
   zone = "${lookup(var.cs_zones, "network")}"
   vpc_id = "${cloudstack_vpc.vpc.0.id}"
   acl_id = "${element(cloudstack_network_acl.acl.*.id, count.index)}"
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 resource "cloudstack_network_acl" "acl" {
