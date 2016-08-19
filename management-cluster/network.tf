@@ -10,7 +10,7 @@ provider "cloudstack" {
 resource "cloudstack_vpc" "vpc" {
   provider = "cloudstack.nl2"
   count = "${lookup(var.counts, "vpc")}"
-  name = "SBP_VPC_${var.clustername}${count.index+1}"
+  name = "MCP_VPC_P${var.clustername}"
   cidr = "10.100.0.0/16"
   vpc_offering = "${lookup(var.offerings, "vpc${count.index}")}"
   zone = "${lookup(var.cs_zones, "vpc")}"
@@ -22,7 +22,7 @@ resource "cloudstack_vpc" "vpc" {
 resource "cloudstack_network" "network" {
   provider = "cloudstack.nl2"
   count = "${lookup(var.counts, "network")}"
-  name = "SBP_NET_${var.clustername}${count.index+1}"
+  name = "MCP_NET_P${var.clustername}"
   display_text = "kubernetes-network-${var.clustername}${count.index+1}"
   cidr = "10.100.0.0/24"
   network_offering = "${lookup(var.offerings, "network")}"
@@ -37,7 +37,7 @@ resource "cloudstack_network" "network" {
 resource "cloudstack_network_acl" "acl" {
   provider = "cloudstack.nl2"
   count = "${lookup(var.counts, "vpc")}"
-  name = "kube-${var.clustername}-acl-${count.index+1}"
+  name = "mcpp${var.clustername}-acl-${count.index+1}"
   vpc_id = "${cloudstack_vpc.vpc.0.id}"
 }
 
@@ -54,14 +54,6 @@ resource "cloudstack_network_acl_rule" "acl-rule" {
   }
 }
 
-resource "cloudstack_ipaddress" "worker_public_ip" {
-  provider = "cloudstack.nl2"
-  count = "${lookup(var.counts, "worker")}"
-  vpc = "${cloudstack_vpc.vpc.0.id}"
-  lifecycle {
-    prevent_destroy = true
-  }
-}
 resource "cloudstack_ipaddress" "master_public_ip" {
   provider = "cloudstack.nl2"
   count = "${lookup(var.counts, "master")}"
@@ -88,16 +80,6 @@ EOF
   }
 }
 
-resource "null_resource" "add_dns_workers" {
-  count = "${lookup(var.counts, "worker")}"
-  provisioner "local-exec" {
-    command = <<EOF
-curl -s -XPUT "https://discover.services.schubergphilis.com:2379/v2/keys/skydns/com/schubergphilis/services/${var.stack_id}k8s-worker${count.index+1}" -d value='{"host":"${element(cloudstack_ipaddress.worker_public_ip.*.ip_address, count.index)}"}'
-EOF
-  }
-}
-
-
 resource "cloudstack_port_forward" "master" {
   provider = "cloudstack.nl2"
   count = "${lookup(var.counts, "master")}"
@@ -123,20 +105,6 @@ resource "cloudstack_port_forward" "master" {
   }
 }
 
-
-resource "cloudstack_port_forward" "worker" {
-  count = "${lookup(var.counts, "worker")}"
-  provider = "cloudstack.nl2"
-  ipaddress = "${element(cloudstack_ipaddress.worker_public_ip.*.id, count.index)}"
-  depends_on = ["cloudstack_instance.kube-worker"]
-  forward {
-    protocol = "tcp"
-    private_port = "1"
-    public_port = "1"
-    virtual_machine_id = "${element(cloudstack_instance.kube-worker.*.id, count.index)}"
-  }
-}
-
 output "addresses" {
-  value = "Master IP addresses are ${join(", ", cloudstack_ipaddress.master_public_ip.*.ipaddress)} and worker IP addresses are ${join(", ", cloudstack_ipaddress.worker_public_ip.*.ipaddress)}" 
+  value = "Master IP addresses are ${join(", ", cloudstack_ipaddress.master_public_ip.*.ipaddress)}"
 }
