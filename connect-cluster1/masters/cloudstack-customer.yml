@@ -31,54 +31,38 @@ spec:
         - --admission-control=NamespaceLifecycle,NamespaceAutoProvision,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota
         - --runtime-config=api/v1
         - --allow-privileged=true
-        - --insecure-bind-address=0.0.0.0
         - --bind-address=0.0.0.0
-        - --insecure-port=8080
         - --secure-port=6443
         - --service-cluster-ip-range=10.100.0.0/24
         - --etcd-servers=http://etcd-client:2379
-        - --etcd-prefix="/master1/"
-        - --advertise-address=85.222.238.79
-        - --service-account-key-file=/opt/kube-serviceaccount.key/kube-serviceaccount.key
+        - --etcd-prefix="/connect1/"
+        - --advertise-address=85.222.238.234
+        - --service-account-key-file=/opt/secrets/kube-serviceaccount.key
         - --service-account-lookup=false
         - --token-auth-file=/opt/tokens/tokens.csv
         - --authorization-policy-file=/opt/auth/auth-policy.json
         - --authorization-mode=ABAC
-        - --client-ca-file=/opt/ca.pem/ca.pem
-        - --tls-cert-file=/opt/kubernetes.pem/kubernetes.pem
-        - --tls-private-key-file=/opt/kubernetes-key.pem/kubernetes-key.pem
-        - --cloud-provider=cloudstack
-        - --cloud-config=/opt/cloud-config/nl2-config
+        - --client-ca-file=/opt/secrets/ca.pem
+        - --tls-cert-file=/opt/secrets/apiserver.pem
+        - --tls-private-key-file=/opt/secrets/apiserver-key.pem
         image: sethkarlo/kube-apiserver
         imagePullPolicy: Always
         name: kube-apiserver
         volumeMounts:
-          - name: kube-serviceaccount-key
-            mountPath: /opt/kube-serviceaccount.key
-          - name: tokens
-            mountPath: /opt/tokens
+          - name: connect1-secrets
+            mountPath: /opt/secrets
           - name: auth
             mountPath: /opt/auth
-          - name: ca-pem
-            mountPath: /opt/ca.pem
-          - name: kubernetes-pem
-            mountPath: /opt/kubernetes.pem
-          - name: kubernetes-key-pem
-            mountPath: /opt/kubernetes-key.pem
-          - name: cloud-config
-            mountPath: /opt/cloud-config
+          - name: tokens
+            mountPath: /opt/tokens
       - command:
         - /usr/local/bin/kube-controller-manager
         - --master=http://127.0.0.1:8080
-        - --cloud-provider=cloudstack
-        - --cloud-config=/opt/cloud-config/nl2-config
         - --service-account-private-key-file=/opt/kube-serviceaccount.key/kube-serviceaccount.key
         - --leader-elect=true
         volumeMounts:
-          - name: kube-serviceaccount-key
-            mountPath: /opt/kube-serviceaccount.key
-          - name: cloud-config
-            mountPath: /opt/cloud-config
+          - name: connect1-secrets
+            mountPath: /opt/secrets
           - name: ca-certificates
             mountPath: /usr/share/ca-certificates
           - name: etc-ssl
@@ -98,27 +82,15 @@ spec:
       securityContext: {}
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: tokens
+        - name: connect1-secrets
           secret:
-            secretName: tokens
+            secretName: connect1-secrets
         - name: auth
           secret:
             secretName: auth
-        - name: ca-pem
+        - name: tokens
           secret:
-            secretName: ca.pem
-        - name: kubernetes-pem
-          secret:
-            secretName: kubernetes.pem
-        - name: kubernetes-key-pem
-          secret:
-            secretName: kubernetes-key.pem
-        - name: kube-serviceaccount-key
-          secret:
-            secretName: kube-serviceaccount.key
-        - name: cloud-config
-          secret:
-            secretName: cloud-config
+            secretName: tokens
         - name: ca-certificates
           hostPath:
             path: /usr/share/ca-certificates
